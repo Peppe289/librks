@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 
+#include "syscall.h"
 #include "utils.h"
 
 struct meminfo {
@@ -93,14 +95,10 @@ float memory_percentage() {
 
 /**
  * Clean up RAM usage with sync and drop cache.
+ * NOTE: Don't need root
  */
-int clear_ram(void)
+void clear_ram(void)
 {
-    FILE *cmd;
-    cmd = popen("sync; echo 3 > /proc/sys/vm/drop_caches", "r");
-
-    if (cmd == NULL)
-        return ERROR_POPEN;
-
-    return pclose(cmd);
+    sync();
+    syscall_drop_cache4();
 }

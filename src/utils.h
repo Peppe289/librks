@@ -73,7 +73,7 @@ char *find_file(char *dir_path, const char *file);
 
 /** memory utils **/
 float memory_percentage();
-int clear_ram(void);
+void clear_ram(void);
 /** end memory utils **/
 
 /** GPU utils **/
