@@ -5,6 +5,7 @@
 #include <cstring>
 
 #include "utils.h"
+#include "cpu.h"
 
 using namespace std;
 
@@ -21,12 +22,13 @@ struct CPUVendorID {
     }
 };
 
-void *get_cpu_id_cpp() {
+void get_cpu_id_cpp() {
     unsigned int level = 0;
-    unsigned int eax = 0;
-    unsigned int ebx;
-    unsigned int ecx;
-    unsigned int edx;
+    unsigned int eax = 0, ebx, ecx, edx;
+
+    // already loaded
+    if (cpuid[0] != '\0')
+        return;
 
     __get_cpuid(level, &eax, &ebx, &ecx, &edx);
 
@@ -48,15 +50,10 @@ void *get_cpu_id_cpp() {
 
     auto it = vendorIdToName.find(vendorIDString);
     string vendorName = (it == vendorIdToName.end()) ? "Unknown" : it->second;
+    //ret.eax = eax;
+    //strcpy(ret.vendorIDString, &vendorIDString[0]);
+    //strcpy(ret.vendorName, &vendorName[0]);
 
-    struct vendor_cpuid *ret;
-    ret = (struct vendor_cpuid *)malloc(sizeof(struct vendor_cpuid));
-    ret->eax = eax;
-    ret->vendorIDString = (char *)malloc((vendorIDString.size() + 1) * sizeof(char));
-    strcpy(ret->vendorIDString, &vendorIDString[0]);
+    strcpy(cpuid, &vendorName[0]);
 
-    ret->vendorName = (char *)malloc((vendorName.size() + 1) * sizeof(char));
-    strcpy(ret->vendorName, &vendorName[0]);
-
-    return ret;
 }

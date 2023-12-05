@@ -10,8 +10,8 @@ Public function:
 - cpu.c: 
     - max_Thread(void)
     - SingleThreadMaxFreq(thread)
-    - get_cpu_temp()
-        - for now support AMD and intel.
+    - get_cpu_temp() [x]
+        - for now support AMD.
     - get_possible_governor()
 - fan_service.c:
     - get_fan_speed()

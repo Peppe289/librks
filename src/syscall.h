@@ -13,6 +13,6 @@
 #include <asm/unistd_32.h>
 
 #define DROP_CACHE4 600
-#define syscall_drop_cache4(...) syscall(DROP_CACHE4);
+#define syscall_drop_cache4(...) syscall(DROP_CACHE4)
 
 #endif // __SYSCALL_RKS_H__
