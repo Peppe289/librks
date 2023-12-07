@@ -8,7 +8,7 @@ What can he do?
 Public function:
 
 - cpu.c: 
-    - max_Thread(void)
+    - max_Thread(void) [x]
     - SingleThreadMaxFreq(thread)
     - get_cpu_temp() [x]
         - for now support AMD.
@@ -18,7 +18,7 @@ Public function:
         - for now only for asus motherboard
 - meminfo.c:
     - memory_percentage()
-    - clear_ram()
+    - clear_ram() [x]
 - gpu.c:
     - get_gpu_usage()
     - get_gpu_thermal()

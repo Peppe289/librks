@@ -10,6 +10,7 @@
 
 char cpuid[126] = {'\0'};
 char pthermal_ctl[MAX_PATH_SIZE] = {'\0'};
+unsigned int cpu_thread = 0;
 
 static int __sysctl_thermal_CPU(void)
 {
@@ -31,7 +32,6 @@ static int __sysctl_thermal_CPU(void)
     {
         // do nothing for now
     }
-
 
     if (pipe(pipefd) < 0)
     {
@@ -64,24 +64,25 @@ static int __sysctl_thermal_CPU(void)
 
         if (rd != 0)
             printf("%s\n", path);
-        else {
+        else
+        {
             printf("Not found");
             path[0] = '\0';
         }
 
         /* We don't need exit status. All exception are controlled */
         waitpid(pid, NULL, 0);
-    }
 
-    // node not found
-    if (rd == 0)
-        return -1;
+        // node not found
+        if (rd == 0)
+            return -1;
+    }
 
     strncpy(pthermal_ctl, path, strlen(path) - sizeof("name"));
     return 0;
 }
 
-static double sysctl_thermal_CPU()
+static double sysctl_thermal_CPU(void)
 {
     int ret;
     int fd;
@@ -91,23 +92,37 @@ static double sysctl_thermal_CPU()
     ret = __sysctl_thermal_CPU();
     if (ret < 0)
         exit(-1);
-    
+
     strcpy(tpath, pthermal_ctl); // copy absolute path
     strcat(tpath, "temp1_input");
 
     fd = open(tpath, O_RDONLY);
 
     ret = read(fd, data, sizeof(data));
-    if (ret < 0) {
+    if (ret < 0)
+    {
         perror("Error to read node\n");
         exit(-1);
     }
 
     close(fd);
 
-    return atoi(data) / 1000;   
+    return atoi(data) / 1000;
 }
 
-double get_cpu_temp() {
+double get_cpu_temp(void)
+{
     return sysctl_thermal_CPU();
+}
+
+static void __cpu_thread(void)
+{
+    if (cpu_thread == 0)
+        get_cpu_id_cpp();
+}
+
+int max_Thread(void)
+{
+    __cpu_thread();
+    return cpu_thread;
 }
