@@ -40,5 +40,5 @@ double ram_size(void)
     if (ret < 0)
         return ret;
 
-    return sys_info.totalram;
+    return sys_info.totalram / (1024 * 1024 * 1024);
 }
