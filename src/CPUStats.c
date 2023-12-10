@@ -62,11 +62,8 @@ static int __sysctl_thermal_CPU(void)
         close(pipefd[0]);
         close(devNUll);
 
-        if (rd != 0)
-            printf("%s\n", path);
-        else
-        {
-            printf("Not found");
+        if (_unlikely(rd == 0)) {
+            print_err("Not found");
             path[0] = '\0';
         }
 
