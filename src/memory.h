@@ -7,7 +7,7 @@ extern "C"
 #endif
 
     int clear_ram(void);
-    double ram_size(void);
+    long int ram_size(void);
 
 #ifdef __cplusplus
 }

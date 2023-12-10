@@ -7,7 +7,7 @@ extern "C"
 #endif
 
     extern char cpuid[126];
-    extern unsigned int cpu_thread = 0;
+    extern unsigned int cpu_thread;
 
     double get_cpu_temp(void);
     int max_Thread(void);

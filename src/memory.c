@@ -29,7 +29,7 @@ int clear_ram(void)
     return 0;
 }
 
-double ram_size(void)
+long int ram_size(void)
 {
     int ret = 0;
 
@@ -40,5 +40,5 @@ double ram_size(void)
     if (ret < 0)
         return ret;
 
-    return sys_info.totalram / (1024 * 1024 * 1024);
+    return sys_info.totalram;
 }
