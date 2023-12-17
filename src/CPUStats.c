@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/sysinfo.h>
 
 #include "utils.h"
 
@@ -10,7 +11,6 @@
 
 char cpuid[126] = {'\0'};
 char pthermal_ctl[MAX_PATH_SIZE] = {'\0'};
-unsigned int cpu_thread = 0;
 
 static int __sysctl_thermal_CPU(void)
 {
@@ -112,14 +112,11 @@ double get_cpu_temp(void)
     return sysctl_thermal_CPU();
 }
 
-static void __cpu_thread(void)
-{
-    if (cpu_thread == 0)
-        get_cpu_id_cpp();
+int system_designed_cpu(void) {
+    return get_nprocs_conf();
 }
 
-int max_Thread(void)
+int system_available_cpu(void)
 {
-    __cpu_thread();
-    return cpu_thread;
+    return get_nprocs();
 }

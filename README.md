@@ -8,7 +8,7 @@ What can he do?
 Public function:
 
 - cpu.c: 
-    - max_Thread(void) [x]
+    - system_available_cpu(void) [x]
     - SingleThreadMaxFreq(thread)
     - get_cpu_temp() [x]
         - for now support AMD.

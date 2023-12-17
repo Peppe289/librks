@@ -50,10 +50,6 @@ void get_cpu_id_cpp() {
 
     auto it = vendorIdToName.find(vendorIDString);
     string vendorName = (it == vendorIdToName.end()) ? "Unknown" : it->second;
-    cpu_thread = eax;
-    //strcpy(ret.vendorIDString, &vendorIDString[0]);
-    //strcpy(ret.vendorName, &vendorName[0]);
 
     strcpy(cpuid, &vendorName[0]);
-
 }
