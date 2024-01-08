@@ -7,7 +7,11 @@ extern "C"
 #endif
 
     int clear_ram(void);
-    long int ram_size(void);
+    long int size_ram(void);
+    long int free_ram(void);
+    long int shared_ram(void);
+    long int buffer_ram(void);
+    long int size_swap(void);
 
 #ifdef __cplusplus
 }
