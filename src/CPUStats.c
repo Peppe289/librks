@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/sysinfo.h>
+#include <dirent.h>
 
 #include "utils.h"
 
@@ -12,14 +13,62 @@
 char cpuid[126] = {'\0'};
 char pthermal_ctl[MAX_PATH_SIZE] = {'\0'};
 
+static int find_thermal_control(const char *path, const char *vendor)
+{
+    DIR *dir;
+    struct dirent *entry;
+    char buff[250];
+    int fd;
+    char tmp[50];
+
+    if ((dir = opendir(path)) == NULL)
+        return 0;
+
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if ((strcmp(entry->d_name, ".") == 0) || (strcmp(entry->d_name, "..") == 0))
+            continue;
+
+        memset(buff, 0, sizeof(buff));
+        sprintf(buff, "%s/%s", path, entry->d_name);
+
+
+        if (entry->d_type == DT_DIR)
+        {
+            if (find_thermal_control(buff, vendor) == 1) {
+                closedir(dir);
+                return 1;
+            }
+        }
+        else if (strcmp(entry->d_name, "name") == 0)
+        {
+            if ((fd = open(buff, O_RDONLY)) < 0) {
+                perror("Error to open file");
+                continue;
+            }
+
+            if (read(fd, tmp, sizeof(tmp)) < 0) {
+                perror("Error to read file");
+                close(fd);
+                continue;
+            }
+
+            if (memcmp(tmp, vendor, strlen(vendor)) == 0) {
+                memset(pthermal_ctl, 0, sizeof(pthermal_ctl));
+                sprintf(pthermal_ctl, "%s/", path);
+                close(fd);
+                return 1;
+            }
+        }
+    }
+
+    closedir(dir);
+    return 0;
+}
+
 static int __sysctl_thermal_CPU(void)
 {
     char vendor[126];
-    pid_t pid;
-    int pipefd[2];
-    char path[MAX_PATH_SIZE] = {'\0'};
-    int devNUll = open("/dev/null", O_WRONLY);
-    long rd;
 
     get_cpu_id_cpp();
 
@@ -27,55 +76,13 @@ static int __sysctl_thermal_CPU(void)
         exit(-1);
 
     if (strcmp(cpuid, "AMD") == 0)
-        memcpy(vendor, "^k10temp", sizeof("^k10temp"));
+        memcpy(vendor, "k10temp", sizeof("k10temp"));
     else if (strcmp(cpuid, "Intel") == 0)
     {
         // do nothing for now
     }
 
-    if (pipe(pipefd) < 0)
-    {
-        perror("Error to open pipe\n");
-        exit(-1);
-    }
-
-    if ((pid = fork()) < 0)
-    {
-        perror("Error to fork\n");
-    }
-    else if (pid == 0)
-    {
-        close(pipefd[0]);
-        dup2(pipefd[1], STDOUT_FILENO);
-        dup2(devNUll, STDERR_FILENO);
-        execlp("grep", "grep", "-r", "-E", vendor, "-l", "/sys", NULL);
-        exit(-1); // wrong exec
-    }
-    else
-    {
-        close(pipefd[1]);
-        if ((rd = read(pipefd[0], path, sizeof(path))) < 0)
-        {
-            perror("Error to read()");
-        }
-
-        close(pipefd[0]);
-        close(devNUll);
-
-        if (_unlikely(rd == 0)) {
-            print_err("Not found");
-            path[0] = '\0';
-        }
-
-        /* We don't need exit status. All exception are controlled */
-        waitpid(pid, NULL, 0);
-
-        // node not found
-        if (rd == 0)
-            return -1;
-    }
-
-    strncpy(pthermal_ctl, path, strlen(path) - sizeof("name"));
+    find_thermal_control("/sys/devices", vendor);
     return 0;
 }
 
@@ -98,7 +105,7 @@ static double sysctl_thermal_CPU(void)
     ret = read(fd, data, sizeof(data));
     if (ret < 0)
     {
-        perror("Error to read node\n");
+        perror("Error to read node");
         exit(-1);
     }
 
@@ -112,7 +119,8 @@ double get_cpu_temp(void)
     return sysctl_thermal_CPU();
 }
 
-int system_designed_cpu(void) {
+int system_designed_cpu(void)
+{
     return get_nprocs_conf();
 }
 

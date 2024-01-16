@@ -12,6 +12,7 @@
 
 #define BUFFER_SIZE     255
 
+/**
 #ifndef DT_DIR
 #define DT_DIR  4
 #endif
@@ -19,7 +20,7 @@
 #ifndef DT_FILE
 #define DT_FILE 8
 #endif
-
+*/
 #define print_err(...)                     \
     do                                     \
     {                                      \
